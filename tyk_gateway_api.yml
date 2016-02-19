@@ -17,6 +17,13 @@ paths:
           required: true
           type: string
           format: string
+        -
+          name: x-tyk-authorization
+          in: header
+          description: tyk gateway shared secret
+          required: true
+          type: string
+          format: string
 
       responses:
         200:
@@ -34,6 +41,13 @@ paths:
       description: |
         Create a new *API token* with the *session object* defined in the body
       parameters:
+        -
+          name: x-tyk-authorization
+          in: header
+          description: tyk gateway shared secret
+          required: true
+          type: string
+          format: string
         -
           name: suppress_reset
           in: query
@@ -68,6 +82,13 @@ paths:
       description: |
         Update an *API token* with the *session object* defined in the body, this operatin overwrites the existing object
       parameters:
+        -
+          name: x-tyk-authorization
+          in: header
+          description: tyk gateway shared secret
+          required: true
+          type: string
+          format: string
         - name: keyId
           in: path
           type: string
@@ -115,6 +136,14 @@ paths:
         Add a pre-specified *API token* with the *session object* defined in the body, this operatin creates a custom token that dsoes not use the gateway naming convention for tokens
       
       parameters:
+        -
+          name: x-tyk-authorization
+          in: header
+          description: tyk gateway shared secret
+          required: true
+          type: string
+          format: string
+          
         - name: keyId
           in: path
           type: string
@@ -148,6 +177,14 @@ paths:
         Remove this *API token* from the gateway, this will completely destroy the token and metadata associated with the token and instantly stop access from being granted
       
       parameters:
+        -
+          name: x-tyk-authorization
+          in: header
+          description: tyk gateway shared secret
+          required: true
+          type: string
+          format: string
+          
         - name: keyId
           in: path
           type: string
@@ -183,6 +220,15 @@ paths:
     get:
       description: |
         Gets a list of *API Definition* objects that are currently live on the gateway 
+      
+      parameters:
+        -
+          name: x-tyk-authorization
+          in: header
+          description: tyk gateway shared secret
+          required: true
+          type: string
+          format: string
       
       responses:
         200:
@@ -225,6 +271,14 @@ paths:
         Gets an *API Definition* object, if it exists
         
       parameters:
+        -
+          name: x-tyk-authorization
+          in: header
+          description: tyk gateway shared secret
+          required: true
+          type: string
+          format: string
+          
         - name: apiID
           in: path
           type: string
@@ -242,6 +296,14 @@ paths:
         Deletes an *API Definition* object, if it exists
         
       parameters:
+        -
+          name: x-tyk-authorization
+          in: header
+          description: tyk gateway shared secret
+          required: true
+          type: string
+          format: string
+          
         - name: apiID
           in: path
           type: string
@@ -271,6 +333,14 @@ paths:
         Updates an *API Definition* object, if it exists
         
       parameters:
+        -
+          name: x-tyk-authorization
+          in: header
+          description: tyk gateway shared secret
+          required: true
+          type: string
+          format: string
+          
         - name: apiID
           in: path
           type: string
@@ -308,6 +378,14 @@ paths:
         
       parameters:
         -
+          name: x-tyk-authorization
+          in: header
+          description: tyk gateway shared secret
+          required: true
+          type: string
+          format: string
+          
+        -
           name: api_id
           in: query
           description: API ID to query
@@ -336,6 +414,15 @@ paths:
     get:
       description: |
         Will reload the targetted gateway
+        
+      parameters:
+        -
+          name: x-tyk-authorization
+          in: header
+          description: tyk gateway shared secret
+          required: true
+          type: string
+          format: string
       
       responses:
         200:
@@ -352,6 +439,15 @@ paths:
     get:
       description: |
         Will reload the cluster via the targeted gateway
+      
+      parameters:
+        -
+          name: x-tyk-authorization
+          in: header
+          description: tyk gateway shared secret
+          required: true
+          type: string
+          format: string
       
       responses:
         200:
@@ -370,6 +466,14 @@ paths:
         Create a new OAuth client
         
       parameters:
+        -
+          name: x-tyk-authorization
+          in: header
+          description: tyk gateway shared secret
+          required: true
+          type: string
+          format: string
+          
         - 
           name: oauth_client
           in: body
@@ -393,6 +497,14 @@ paths:
         Delete the OAuth client
         
       parameters:
+        -
+          name: x-tyk-authorization
+          in: header
+          description: tyk gateway shared secret
+          required: true
+          type: string
+          format: string
+          
         -
           name: apiId
           in: path
@@ -433,6 +545,14 @@ paths:
       
       parameters:
         -
+          name: x-tyk-authorization
+          in: header
+          description: tyk gateway shared secret
+          required: true
+          type: string
+          format: string
+          
+        -
           name: apiId
           in: path
           description: API ID that owns this client (back end)
@@ -452,6 +572,14 @@ paths:
         The final request from an authorising party for a redirect URI during the Tyk OAuth flow
       
       parameters:
+        -
+          name: x-tyk-authorization
+          in: header
+          description: tyk gateway shared secret
+          required: true
+          type: string
+          format: string
+          
         -
           name: response_type
           in: formData
@@ -504,6 +632,14 @@ paths:
         Invalidate a refresh token
       
       parameters:
+        -
+          name: x-tyk-authorization
+          in: header
+          description: tyk gateway shared secret
+          required: true
+          type: string
+          format: string
+          
         -
           name: keyId
           in: path
