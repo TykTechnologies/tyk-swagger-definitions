@@ -1,0 +1,1075 @@
+swagger: '2.0'
+
+info:
+  version: "1.9"
+  title: Gateway REST API
+
+paths:
+  /tyk/keys/:
+    get:
+      description: |
+        Gets a list of *key* IDs (will only work with non-hashed installations)
+      parameters:
+        -
+          name: api_id
+          in: query
+          description: Back-end to target
+          required: true
+          type: string
+          format: string
+
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              keys: 
+                type: array
+                items: 
+                  type: string
+                  
+  /tyk/keys/create:
+    post:
+      description: |
+        Create a new *API token* with the *session object* defined in the body
+      parameters:
+        -
+          name: suppress_reset
+          in: query
+          description: Adding the `suppress_reset` parameter and setting it to `1`, will cause Tyk to not reset the quota limit that is in the current live quota manager. By default Tyk will reset the quota in the live quota manager (initialising it) when ADDing a key. Adding the `suppress_reset` flag to the URL parameters will avoid this behaviour.
+          required: false
+          type: number
+          format: integer
+        - 
+          name: session_object
+          in: body
+          schema:
+            $ref: '#/definitions/SessionObject'
+      responses:
+        200:
+          description: Key Created Response
+          schema:
+            type: object
+            properties:
+              key:
+                type: string
+              status:
+                type: string
+                enum:
+                  - ok
+                  - error
+              action:
+                type: string
+                enum:
+                  - create
+  /tyk/keys/{keyId}:
+    put:
+      description: |
+        Update an *API token* with the *session object* defined in the body, this operatin overwrites the existing object
+      parameters:
+        - name: keyId
+          in: path
+          type: string
+          description: Access Token
+          required: true
+        -
+          name: suppress_reset
+          in: query
+          description: Adding the `suppress_reset` parameter and setting it to `1`, will cause Tyk to not reset the quota limit that is in the current live quota manager. By default Tyk will reset the quota in the live quota manager (initialising it) when ADDing a key. Adding the `suppress_reset` flag to the URL parameters will avoid this behaviour.
+          required: false
+          type: number
+          format: integer
+        - 
+          name: session_object
+          in: body
+          schema:
+            $ref: '#/definitions/SessionObject'
+        -
+          name: api_id
+          in: query
+          description: Back-end to target
+          required: true
+          type: string
+          format: string
+      responses:
+        200:
+          description: Key Updated Response
+          schema:
+            type: object
+            properties:
+              key:
+                type: string
+              status:
+                type: string
+                enum:
+                  - ok
+                  - error
+              action:
+                type: string
+                enum:
+                  - modified
+    
+    post:
+      description: |
+        Add a pre-specified *API token* with the *session object* defined in the body, this operatin creates a custom token that dsoes not use the gateway naming convention for tokens
+      
+      parameters:
+        - name: keyId
+          in: path
+          type: string
+          description: Access Token
+          required: true
+        - 
+          name: session_object
+          in: body
+          schema:
+            $ref: '#/definitions/SessionObject'
+      responses:
+        200:
+          description: Key Added Response
+          schema:
+            type: object
+            properties:
+              key:
+                type: string
+              status:
+                type: string
+                enum:
+                  - ok
+                  - error
+              action:
+                type: string
+                enum:
+                  - added
+    
+    delete:
+      description: |
+        Remove this *API token* from the gateway, this will completely destroy the token and metadata associated with the token and instantly stop access from being granted
+      
+      parameters:
+        - name: keyId
+          in: path
+          type: string
+          description: Access Token
+          required: true
+        -
+          name: api_id
+          in: query
+          description: Back-end to target
+          required: true
+          type: string
+          format: string
+          
+      responses:
+        200:
+          description: Key Deleted Response
+          schema:
+            type: object
+            properties:
+              key:
+                type: string
+              status:
+                type: string
+                enum:
+                  - ok
+                  - error
+              action:
+                type: string
+                enum:
+                  - deleted
+
+  /tyk/apis/:
+    get:
+      description: |
+        Gets a list of *API Definition* objects that are currently live on the gateway 
+      
+      responses:
+        200:
+          description: Succesful list response
+          schema:
+            $ref: '#/definitions/APIDefinitionList'
+    
+    post:
+      description: |
+        Create an *API Definition* object
+        
+      parameters:
+        - 
+          name: api_definition
+          in: body
+          schema:
+            $ref: '#/definitions/APIDefinition'
+          
+      responses:
+        200:
+          description: Succesful API Deletion
+          schema:
+            type: object
+            properties:
+              key:
+                type: string
+              status:
+                type: string
+                enum:
+                  - ok
+                  - error
+              action:
+                type: string
+                enum:
+                  - updated
+  
+  /tyk/apis/{apiID}:
+    get:
+      description: |
+        Gets an *API Definition* object, if it exists
+        
+      parameters:
+        - name: apiID
+          in: path
+          type: string
+          description: API ID
+          required: true
+          
+      responses:
+        200:
+          description: Succesful API response
+          schema:
+            $ref: '#/definitions/APIDefinition'
+
+    delete:
+      description: |
+        Deletes an *API Definition* object, if it exists
+        
+      parameters:
+        - name: apiID
+          in: path
+          type: string
+          description: API ID
+          required: true
+          
+      responses:
+        200:
+          description: Succesful API Deletion
+          schema:
+            type: object
+            properties:
+              key:
+                type: string
+              status:
+                type: string
+                enum:
+                  - ok
+                  - error
+              action:
+                type: string
+                enum:
+                  - deleted
+    
+    put:
+      description: |
+        Updates an *API Definition* object, if it exists
+        
+      parameters:
+        - name: apiID
+          in: path
+          type: string
+          description: API ID
+          required: true
+        
+        - 
+          name: api_definition
+          in: body
+          schema:
+            $ref: '#/definitions/APIDefinition'
+          
+      responses:
+        200:
+          description: Succesful API Deletion
+          schema:
+            type: object
+            properties:
+              key:
+                type: string
+              status:
+                type: string
+                enum:
+                  - ok
+                  - error
+              action:
+                type: string
+                enum:
+                  - updated
+
+  /tyk/health/:
+    get:
+      description: |
+        Gets the health check values for an API if it is being recorded
+        
+      parameters:
+        -
+          name: api_id
+          in: query
+          description: API ID to query
+          required: true
+          type: string
+          format: string
+      
+      responses:
+        200:
+          description: Succesful healthcheck response
+          schema:
+            type: object
+            properties:
+              throttle_requests_per_second:
+                type: number
+              quota_violations_per_second:
+                type: number
+              key_failures_per_second:
+                type: number
+              average_upstream_latency:
+                type: number
+              average_requests_per_second:
+                type: number
+
+  /tyk/reload/:
+    get:
+      description: |
+        Will reload the targetted gateway
+      
+      responses:
+        200:
+          description: Succesful reload response
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              error:
+                type: string
+
+  /tyk/reload/group:
+    get:
+      description: |
+        Will reload the cluster via the targeted gateway
+      
+      responses:
+        200:
+          description: Succesful reload response
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              error:
+                type: string
+              
+  /tyk/oauth/clients/create:
+    post:
+      description: |
+        Create a new OAuth client
+        
+      parameters:
+        - 
+          name: oauth_client
+          in: body
+          schema:
+            type: object
+            properties:
+              api_id:
+                type: string
+              redirect_uri:
+                type: string
+      
+      responses:
+        200:
+          description: Succesful create response
+          schema:
+            $ref: '#/definitions/OAuthClient' 
+
+  /tyk/oauth/clients/{apiId}/{clientId}:
+    delete:
+      description: |
+        Delete the OAuth client
+        
+      parameters:
+        -
+          name: apiId
+          in: path
+          description: API ID that owns this client (back end)
+          required: true
+          type: string
+          format: string
+        -
+          name: clientId
+          in: path
+          description: OAuth Client ID to delete
+          required: true
+          type: string
+          format: string
+      
+      responses:
+        200:
+          description: Succesful OAuth client deletion
+          schema:
+            type: object
+            properties:
+              key:
+                type: string
+              status:
+                type: string
+                enum:
+                  - ok
+                  - error
+              action:
+                type: string
+                enum:
+                  - deleted
+  
+  /tyk/oauth/clients/{{apiId}}/:
+    get:
+      description: |
+        Get a list of OAuth clients bound to this back end 
+      
+      parameters:
+        -
+          name: apiId
+          in: path
+          description: API ID that owns this client (back end)
+          required: true
+          type: string
+          format: string
+          
+      responses:
+        200:
+          description: Succesful listy response
+          schema:
+            $ref: '#/definitions/OAuthClients'
+  
+  /tyk/oauth/authorize-client/:
+    post:
+      description: |
+        The final request from an authorising party for a redirect URI during the Tyk OAuth flow
+      
+      parameters:
+        -
+          name: response_type
+          in: formData
+          description: Should be provided by requesting client as part of authorisation request, this should be either `code` or `token` depending on the methods you have specified for the API
+          required: true
+          type: string
+          format: string
+        -
+          name: client_id
+          in: formData
+          description: Should be provided by requesting client as part of authorisation request. The Client ID that is making the request
+          required: true
+          type: string
+          format: string
+        -
+          name: redirect_uri
+          in: formData
+          description: Should be provided by requesting client as part of authorisation request. Must match with the record stored with Tyk
+          required: true
+          type: string
+          format: string
+        -
+          name: key_rules
+          in: formData
+          description: A string representation of a *Session Object (form-encoded)*. This should be provided by your application in order to apply any quotas or rules to the key
+          required: true
+          type: string
+          format: string
+          
+      responses:
+        200:
+          description: Succesful token response
+          schema:
+            type: object
+            properties:
+              redirect_to:
+                type: string
+              code:
+                type: string
+              access_token:
+                type: string
+              expires_in:
+                type: number
+              token_type:
+                type: string
+
+  /tyk/oauth/refresh/{keyId}:
+    delete:
+      description: |
+        Invalidate a refresh token
+      
+      parameters:
+        -
+          name: keyId
+          in: path
+          type: string
+          description: Access Token
+          required: true
+        
+        - name: apiID
+          in: query
+          type: string
+          description: API ID
+          required: true
+      
+      responses:
+        200:
+          description: Succesful token revoked
+          schema:
+            type: object
+            properties:
+              key:
+                type: string
+              status:
+                type: string
+                enum:
+                  - ok
+                  - error
+              action:
+                type: string
+                enum:
+                  - deleted
+      
+
+definitions:
+  OAuthClient:
+    type: object
+    properties:
+      client_id:
+        type: string
+      secret:
+        type: string
+      redirect_uri:
+        type: string
+  
+  OAuthClients:
+    type: array
+    items:
+      $ref: '#/definitions/OAuthClient'   
+
+  AccessRights:
+    type: object
+    properties:
+      api_name: 
+        type: string
+      api_id: 
+        type: string
+      versions: 
+        type: array
+        items:
+          type: string
+          
+  SessionObject:
+    type: object
+    properties:
+      allowance:
+        type: number
+      rate:
+          type: number
+      per:
+          type: number
+      expires:
+          type: number
+      quota_max:
+          type: number
+      quota_renews:
+          type: number
+      quota_remaining:
+          type: number
+      quota_renewal_rate:
+          type: string
+      access_rights:
+          type: object
+          additionalProperties:
+              $ref: '#/definitions/AccessRights'   
+      org_id:
+          type: string
+      meta_data:
+          type: object
+      oauth_client_id:
+          type: string
+      basic_auth_data:
+          type: object
+          properties:
+            password:
+              type: string
+            hash_type:
+              type: string
+              enum:
+                - ""
+                - "bcrypt"
+                
+      jwt_data:
+          type: object
+          properties:
+            secret: 
+              type: string
+      hmac_enabled:
+          type: boolean
+      hmac_string:
+          type: string
+      is_inactive:
+          type: boolean
+      apply_policy_id:
+          type: string
+      monitor:
+          type: object
+          properties:
+            trigger_limits:
+              type: array
+              items:
+                type: string
+      tags:
+          type: array
+          items:
+            type: string
+  
+  EndpointMethodMeta:
+    type: object
+    properties:
+      action:
+        type: string
+      code:
+        type: number
+      data:
+        type: string
+      headers:
+        type: object
+    
+  EndPointMeta:
+    type: object
+    properties:
+      path:
+        type: string
+      method_actions:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/EndpointMethodMeta' 
+  
+  TemplateMeta:
+    type: object
+    properties:
+      template_data:
+        type: object
+        properties:
+          input_type: 
+            type: string
+          template_mode: 
+            type: string
+          enable_session:
+            type: boolean
+      path:
+        type: string
+      method:
+        type: string
+  
+  HeaderInjectionMeta:
+    type: object
+    properties:
+      delete_headers: 
+        type: array
+        items:
+          type: string
+      add_headers:
+        type: object
+      path:
+        type: string
+      method:
+        type: string
+  
+  VersionDefinition: 
+    type: object
+    properties:
+      name:
+        type: string
+      expires:
+        type: string
+      global_headers:
+        type: object
+      global_headers_remove:
+        type: array
+        items:
+          type: string
+      global_size_limit:
+        type: number
+      override_target:
+        type: string
+      use_extended_paths:
+        type: boolean
+      extended_paths:
+        type: object
+        properties:
+          ignored:
+            type: array
+            items:
+              $ref: '#/definitions/EndPointMeta'
+          white_list:
+            type: array
+            items:
+                $ref: '#/definitions/EndPointMeta' 
+          black_list:
+            type: array
+            items:
+                $ref: '#/definitions/EndPointMeta' 
+          cache:
+            type: array
+            items:
+              type: string
+          transform:
+            type: array
+            items:
+                $ref: '#/definitions/TemplateMeta' 
+          transform_response:
+            type: array
+            items:
+                $ref: '#/definitions/TemplateMeta'
+          transform_headers:
+            type: array
+            items:
+                $ref: '#/definitions/HeaderInjectionMeta'
+          transform_response_headers:
+            type: array
+            items:
+                $ref: '#/definitions/HeaderInjectionMeta'
+          hard_timeouts:
+            type: array
+            items:
+              type: object
+              properties:
+                path:
+                  type: string
+                method:
+                  type: string
+                timeout:
+                  type: number
+          circuit_breakers:
+            type: array
+            items:
+              type: object
+              properties:
+                path:
+                  type: string
+                method:
+                  type: string
+                threshold_percent:
+                  type: number
+                samples:
+                  type: number
+                return_to_service_after:
+                  type: number
+          url_rewrites:
+            type: array
+            items:
+              type: object
+              properties:
+                path:
+                  type: string
+                method:
+                  type: string
+                match_pattern:
+                  type: string
+                rewrite_to:
+                  type: string
+          virtual:
+            type: array
+            items:
+              type: object
+              properties:
+                path:
+                  type: string
+                method:
+                  type: string
+                response_function_name:
+                  type: string
+                function_source_type:
+                  type: string
+                function_source_uri:
+                  type: string
+                use_session:
+                  type: boolean
+          size_limits:
+            type: array
+            items:
+              type: object
+              properties:
+                path:
+                  type: string
+                method:
+                  type: string
+                size_limit:
+                  type: number
+  
+  MiddlewareDefinition:
+    type: object
+    properties:
+      name:
+        type: string
+      path: 
+        type: string
+      require_session: 
+        type: boolean
+    
+  
+  ServiceDiscoverConfiguration:
+    type: object
+    properties:
+      use_discovery_service:
+        type: string
+      query_endpoint:
+        type: string
+      use_nested_query:
+        type: boolean
+      parent_data_path:
+        type: string
+      data_path:
+        type: string
+      port_data_path:
+        type: string
+      use_target_list:
+        type: boolean
+      cache_timeout:
+        type: number
+      endpoint_returns_list:
+        type: boolean
+  
+  APIDefinition:
+    type: object
+    properties: 
+      id:
+        type: string
+      name:
+        type: string
+      slug:
+        type: string
+      api_id:
+        type: string
+      org_id:
+        type: string
+      use_keyless:
+        type: boolean
+      use_oauth2:
+        type: boolean
+      oauth_meta:
+        type: object
+        properties:
+          allowed_access_types:
+            type: array
+            items:
+              type: string
+          allowed_authorize_types:
+            type: array
+            items:
+              type: string
+          auth_login_redirect:
+            type: string
+      auth:
+        type: object
+        properties:
+          use_param:
+            type: boolean
+          use_cookie:
+            type: boolean
+          auth_header_name:
+            type: string
+      use_basic_auth:
+        type: boolean
+      enable_jwt:
+        type: boolean
+      jwt_signing_method:
+        type: string
+      jwt_source:
+        type: string
+      jwt_identity_base_field:
+        type: string
+      jwt_policy_field_name:
+        type: string
+      notifications:
+        type: object
+        properties:
+          shared_secret:
+            type: string
+          oauth_on_keychange_url:
+            type: string
+      enable_signature_checking:
+        type: boolean
+      hmac_allowed_clock_skew:
+        type: number
+      definition:
+        type: object
+        properties:
+          location:
+            type: string
+          key:
+            type: string
+      version_data:
+        type: object
+        properties:
+          not_versioned:
+            type: boolean
+          versions:
+            type: object
+            additionalProperties:
+              $ref: '#/definitions/VersionDefinition'
+      uptime_tests:
+        type: object
+        properties:
+          check_list:
+            type: array
+            items:
+              type: object
+              properties:
+                url:
+                  type: string
+                method:
+                  type: string
+                headers:
+                  type: array
+                  items:
+                    type: object
+                body:
+                  type: string
+          config:
+            type: object
+            properties:
+              expire_utime_after:
+                type: number
+              service_discovery:
+                $ref: '#/definitions/ServiceDiscoverConfiguration'
+              recheck_wait:
+                type: number
+          proxy:
+            type: object
+            properties:
+              preserve_host_header:
+                type: boolean
+              listen_path:
+                type: string
+              target_url:
+                type: string
+              strip_listen_path:
+                type: boolean
+              enable_load_balancing:
+                type: boolean
+              target_list:
+                type: array
+                items:
+                  type: string
+              check_host_against_uptime_tests:
+                type: boolean
+              service_discovery:
+                $ref: '#/definitions/ServiceDiscoverConfiguration'
+                
+          custom_middleware:
+            type: object
+            properties:
+              pre:
+                type: array
+                items:
+                  $ref: '#/definitions/MiddlewareDefinition'
+              post:
+                type: array
+                items:
+                  $ref: '#/definitions/MiddlewareDefinition'
+              response:
+                type: array
+                items:
+                  $ref: '#/definitions/MiddlewareDefinition'
+          
+          cache_options:
+            type: object
+            properties:
+              cache_timeout:
+                type: number
+              enable_cache:
+                type: boolean
+              cache_all_safe_requests:
+                type: boolean
+              enable_upstream_cache_control:
+                type: boolean
+          
+          session_lifetime:
+            type: number
+          
+          active:
+            type: boolean
+          
+          event_handlers:
+            type: object
+          
+          enable_batch_request_support:
+            type: boolean
+          
+          enable_ip_whitelisting:
+            type: boolean
+          
+          allowed_ips:
+            type: array
+            items:
+              type: string
+          
+          dont_set_quota_on_create:
+            type: boolean
+          
+          expire_analytics_after:
+            type: number
+          
+          response_processors:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                options:
+                  type: object
+            
+          CORS:
+            type: object
+            properties:
+              enable:
+                type: boolean
+              allowed_origins:
+                type: array
+                items:
+                  type: string
+              allowed_methods:
+                type: array
+                items:
+                  type: string
+              allowed_headers:
+                type: array
+                items:
+                  type: string
+              exposed_headers:
+                type: array
+                items:
+                  type: string
+              allow_credentials:
+                type: boolean
+              max_age:
+                type: number
+              options_passthrough:
+                type: boolean
+              debug:
+                type: boolean
+          
+          domain:
+            type: string
+          
+          do_not_track:
+            type: string 
+          
+          tags:
+            type: array
+            items:
+              type: string
+
+  APIDefinitionList:
+      type: array
+      items:
+        $ref: '#/definitions/APIDefinition'
