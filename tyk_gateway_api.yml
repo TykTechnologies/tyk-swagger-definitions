@@ -538,7 +538,7 @@ paths:
                 enum:
                   - deleted
   
-  /tyk/oauth/clients/{{apiId}}/:
+  /tyk/oauth/clients/{apiId}:
     get:
       description: |
         Get a list of OAuth clients bound to this back end 
